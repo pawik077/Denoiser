@@ -35,7 +35,7 @@ def adjust_saturation(image, label):
 	image = tf.image.random_saturation([image, label], 1, 5)
 	return image, label
 
-def dataset_aug(x, y, batch_size=32, augmentations=None):
+def dataset_generator(x, y, batch_size=32, augmentations=None):
 	# x: noisy images
 	# y: clean images
 	# augmentations: list of augmentation functions
