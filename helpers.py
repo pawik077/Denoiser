@@ -67,7 +67,7 @@ def load_images(img_paths):
     images = []
     for path in img_paths:
         img = cv.imread(path)
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        img = cv.cvtColor(img, cv.COLOR_BGR2RGB) # openCV reads images in BGR format, convert to RGB for nn and plotting
         img = cv.resize(img, (256, 256))
         images.append(img)
     return np.asarray(images)
