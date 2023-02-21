@@ -3,6 +3,8 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 import random
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
 
 from helpers import *
 
@@ -52,8 +54,21 @@ if __name__ == '__main__':
     # infer
     denoised_imgs = infer(model, noisy_imgs)
     print(f'Paths: \n{[noisy_paths[i] for i in choices]}')
+
+    # metrics
+    psnr_gt_mean = np.mean([psnr(gt_imgs[i], noisy_imgs[i]) for i in range(len(gt_imgs))])
+    psnr_denoised_mean = np.mean([psnr(gt_imgs[i], denoised_imgs[i]) for i in range(len(gt_imgs))])
+    ssim_gt_mean = np.mean([ssim(gt_imgs[i], noisy_imgs[i], channel_axis=-1, data_range=noisy_imgs[i].max() - noisy_imgs[i].min()) for i in range(len(gt_imgs))])
+    ssim_denoised_mean = np.mean([ssim(gt_imgs[i], denoised_imgs[i], channel_axis=-1, data_range=denoised_imgs[i].max() - denoised_imgs[i].min()) for i in range(len(gt_imgs))])
+    print(f'PSNR (GT): {psnr_gt_mean}')
+    print(f'PSNR (Denoised): {psnr_denoised_mean}')
+    print(f'SSIM (GT): {ssim_gt_mean}')
+    print(f'SSIM (Denoised): {ssim_denoised_mean}')
+
     # visualize
     for i in range(10):
         visualize(noisy_imgs[i], denoised_imgs[i], gt_imgs[i], f'{model_name}_{i}_plot')
         denoised_imgs[i] = cv.cvtColor(denoised_imgs[i], cv.COLOR_RGB2BGR) # openCV uses BGR, so we need to convert back
-        print(cv.imwrite(f'./results/{model_name}_{i}.png', denoised_imgs[i]))
+        is_saved = cv.imwrite(f'./results/{model_name}_{i}.png', denoised_imgs[i])
+        if not is_saved:
+            print(f'Failed to save {model_name}_{i}.png')
