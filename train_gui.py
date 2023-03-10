@@ -1,39 +1,6 @@
-# import tkinter as tk
-
-
-# class GUI(tk.Tk):
-#     def __init__(self):
-#         super().__init__()
-#         self.title("GUI")
-#         self.geometry("500x500")
-#         self.resizable(False, False)
-#         self.config(bg="#000000")
-#         self.create_widgets()
-
-#     def create_widgets(self):
-#         self.btn = tk.Button(self, text="Button", command=self.btn_click)
-#         self.btn.pack()
-
-#     def btn_click(self):
-#         print("Button clicked!")
-
-# if __name__ == "__main__":
-#     gui = GUI()
-#     gui.mainloop()
-
-# from tkinter import *
-# from tkinter import ttk
-# root = Tk()
-# frm = ttk.Frame(root, padding=10)
-# frm.grid()
-# ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
-# ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
-# root.mainloop()
 import tkinter as tk
 import tkinter.ttk as ttk
 from train import train
-
-# import augmentation
 
 models = ["REDNet", "MWCNN", "PRIDNet"]
 
@@ -43,8 +10,6 @@ class GUI(tk.Tk):
         super().__init__()
         self.title("GUI")
         self.geometry("500x500")
-        #self.resizable(False, False)
-        #self.config(bg="#000000")
         self.datasets = {
             "SIDD": tk.BooleanVar(value=True),
             "RENOIR": tk.BooleanVar(value=True),
