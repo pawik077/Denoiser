@@ -62,62 +62,62 @@ class GUI(tk.Tk):
         self.create_widgets()
 
     def create_widgets(self):
-        self.btn = ttk.Button(self, text="Debug", command=self.debug)
-        self.btn.pack()
+        self.btn_debug = ttk.Button(self, text="Debug", command=self.debug)
+        self.btn_debug.pack()
         
-        self.datasets_label = ttk.Label(self, text="Datasets:")
-        self.datasets_label.pack()
-        self.datasets_cbs = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.datasets.items()]
-        for _, cb in enumerate(self.datasets_cbs): cb.pack()
+        self.lbl_datasets = ttk.Label(self, text="Datasets:")
+        self.lbl_datasets.pack()
+        self.cbs_datasets = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.datasets.items()]
+        for _, cb in enumerate(self.cbs_datasets): cb.pack()
 
-        self.model_label = ttk.Label(self, text="Model:")
-        self.model_label.pack()
-        self.model = ttk.Combobox(self, values=models, state="readonly")
-        self.model.bind("<<ComboboxSelected>>", self.change_model)
-        self.model.pack()
-        self.model.current(0)
+        self.lbl_model = ttk.Label(self, text="Model:")
+        self.lbl_model.pack()
+        self.cbb_model = ttk.Combobox(self, values=models, state="readonly")
+        self.cbb_model.bind("<<ComboboxSelected>>", self.change_model)
+        self.cbb_model.pack()
+        self.cbb_model.current(0)
 
-        self.augment_label = ttk.Label(self, text="Augmentations:")
-        self.augment_label.pack()
-        self.augment_cbs = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.augmentations.items()]
-        for _, cb in enumerate(self.augment_cbs): cb.pack()
+        self.lbl_augment = ttk.Label(self, text="Augmentations:")
+        self.lbl_augment.pack()
+        self.cbs_augment = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.augmentations.items()]
+        for _, cb in enumerate(self.cbs_augment): cb.pack()
 
-        self.filename_label = ttk.Label(self, text="Filename:")
-        self.filename_label.pack()
-        self.filename = ttk.Entry(self)
-        self.filename.insert(0, self.model.get() + ".h5")
-        self.filename.pack()
+        self.lbl_filename = ttk.Label(self, text="Filename:")
+        self.lbl_filename.pack()
+        self.ent_filename = ttk.Entry(self)
+        self.ent_filename.insert(0, self.cbb_model.get() + ".h5")
+        self.ent_filename.pack()
 
-        self.epochs_label = ttk.Label(self, text="Epochs:")
-        self.epochs_label.pack()
-        self.epochs = ttk.Entry(self)
-        self.epochs.insert(0, 200)
-        self.epochs.pack()
+        self.lbl_epochs = ttk.Label(self, text="Epochs:")
+        self.lbl_epochs.pack()
+        self.ent_epochs = ttk.Entry(self)
+        self.ent_epochs.insert(0, 200)
+        self.ent_epochs.pack()
 
 
 
-        self.train_btn = ttk.Button(self, text="Train", command=self.train_trigger)
-        self.train_btn.pack()
+        self.btn_train = ttk.Button(self, text="Train", command=self.train_trigger)
+        self.btn_train.pack()
 
     def train_trigger(self):
         datasets = [k for k,v in self.datasets.items() if v.get()]
-        model = self.model.get()
+        model = self.cbb_model.get()
         augmentations = [k for k,v in self.augmentations.items() if v.get()]
-        filename = self.filename.get()
-        epochs = int(self.epochs.get())
+        filename = self.ent_filename.get()
+        epochs = int(self.ent_epochs.get())
         #train(datasets, model, augmentations, filename, epochs)
         pass
 
     def change_model(self, *args):
-        self.filename.delete(0, tk.END)
-        self.filename.insert(0, self.model.get() + ".h5")
+        self.ent_filename.delete(0, tk.END)
+        self.ent_filename.insert(0, self.cbb_model.get() + ".h5")
     
     def debug(self):
         print(f"Datasets: {[k for k,v in self.datasets.items() if v.get()]}")
-        print(f"Model: {self.model.get()}")
+        print(f"Model: {self.cbb_model.get()}")
         print(f'Augmentations: {[k for k,v in self.augmentations.items() if v.get()]}')
-        print(f"Filename: {self.filename.get()}")
-        print(f"Epochs: {self.epochs.get()}")
+        print(f"Filename: {self.ent_filename.get()}")
+        print(f"Epochs: {self.ent_epochs.get()}")
 
 
 if __name__ == "__main__":
