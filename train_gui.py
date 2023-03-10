@@ -30,36 +30,48 @@ class GUI(tk.Tk):
         self.btn_debug = ttk.Button(self, text="Debug", command=self.debug)
         self.btn_debug.pack()
         
-        self.lbl_datasets = ttk.Label(self, text="Datasets:")
+        self.frm_datasets = tk.Frame(self)
+        self.frm_datasets.pack()
+        self.lbl_datasets = ttk.Label(self.frm_datasets, text="Datasets:")
         self.lbl_datasets.pack()
-        self.cbs_datasets = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.datasets.items()]
+        self.cbs_datasets = [tk.Checkbutton(self.frm_datasets, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.datasets.items()]
         for _, cb in enumerate(self.cbs_datasets): cb.pack()
 
-        self.lbl_model = ttk.Label(self, text="Model:")
+        self.frm_model = tk.Frame(self)
+        self.frm_model.pack()
+
+        self.lbl_model = ttk.Label(self.frm_model, text="Model:")
         self.lbl_model.pack()
-        self.cbb_model = ttk.Combobox(self, values=models, state="readonly")
+        self.cbb_model = ttk.Combobox(self.frm_model, values=models, state="readonly")
         self.cbb_model.bind("<<ComboboxSelected>>", self.change_model)
         self.cbb_model.pack()
         self.cbb_model.current(0)
 
-        self.lbl_augment = ttk.Label(self, text="Augmentations:")
+        self.frm_augment = tk.Frame(self)
+        self.frm_augment.pack()
+
+        self.lbl_augment = ttk.Label(self.frm_augment, text="Augmentations:")
         self.lbl_augment.pack()
-        self.cbs_augment = [tk.Checkbutton(self, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.augmentations.items()]
+        self.cbs_augment = [tk.Checkbutton(self.frm_augment, text=k, variable=v, onvalue=True, offvalue=False) for (k,v) in self.augmentations.items()]
         for _, cb in enumerate(self.cbs_augment): cb.pack()
 
-        self.lbl_filename = ttk.Label(self, text="Filename:")
+        self.frm_filename = tk.Frame(self)
+        self.frm_filename.pack()
+
+        self.lbl_filename = ttk.Label(self.frm_filename, text="Filename:")
         self.lbl_filename.pack()
-        self.ent_filename = ttk.Entry(self)
+        self.ent_filename = ttk.Entry(self.frm_filename)
         self.ent_filename.insert(0, self.cbb_model.get() + ".h5")
         self.ent_filename.pack()
 
-        self.lbl_epochs = ttk.Label(self, text="Epochs:")
+        self.frm_epochs = tk.Frame(self)
+        self.frm_epochs.pack()
+
+        self.lbl_epochs = ttk.Label(self.frm_epochs, text="Epochs:")
         self.lbl_epochs.pack()
-        self.ent_epochs = ttk.Entry(self)
+        self.ent_epochs = ttk.Entry(self.frm_epochs)
         self.ent_epochs.insert(0, 200)
         self.ent_epochs.pack()
-
-
 
         self.btn_train = ttk.Button(self, text="Train", command=self.train_trigger)
         self.btn_train.pack()
