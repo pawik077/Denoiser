@@ -1,6 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from train import train
+from REDNet import REDNet_model
+import augmentation
 
 models = ["REDNet", "MWCNN", "PRIDNet"]
 
@@ -75,15 +77,45 @@ class GUI(tk.Tk):
 
         self.btn_train = ttk.Button(self, text="Train", command=self.train_trigger)
         self.btn_train.pack()
+        
+        self.lbl_processing = ttk.Label(self, text='')
+        self.lbl_processing.pack()
 
     def train_trigger(self):
+        self.lbl_processing.config(text="Training model (consult terminal)...")
+        self.update()
         datasets = [k for k,v in self.datasets.items() if v.get()]
-        model = self.cbb_model.get()
-        augmentations = [k for k,v in self.augmentations.items() if v.get()]
         filename = self.ent_filename.get()
         epochs = int(self.ent_epochs.get())
-        #train(datasets, model, augmentations, filename, epochs)
-        pass
+        match self.cbb_model.get():
+            case "REDNet":
+                model = REDNet_model()
+            case "MWCNN":
+                # model = MWCNN_model()
+                raise NotImplementedError("MWCNN is not implemented yet")
+            case "PRIDNet":
+                # model = PRIDNet_model()
+                raise NotImplementedError("PRIDNet is not implemented yet")
+        augmentations = []
+        for a in [k for k,v in self.augmentations.items() if v.get()]:
+            match a:
+                case "Up-down flip":
+                    augmentations.append(augmentation.up_down_flip)
+                case "Left-right flip":
+                    augmentations.append(augmentation.left_right_flip)
+                case "Rotate":
+                    augmentations.append(augmentation.rotate)
+                case "Adjust hue":
+                    augmentations.append(augmentation.adjust_hue)
+                case "Adjust brightness":
+                    augmentations.append(augmentation.adjust_brightness)
+                case "Adjust contrast":
+                    augmentations.append(augmentation.adjust_contrast)
+                case "Adjust saturation":
+                    augmentations.append(augmentation.adjust_saturation)
+        train(model, datasets, augmentations, filename, epochs)
+        self.lbl_processing.config(text="Done!")
+        self.update()
 
     def change_model(self, *args):
         self.ent_filename.delete(0, tk.END)
