@@ -93,9 +93,11 @@ class GUI(tk.Tk):
                 model = REDNet_model()
             case "MWCNN":
                 # model = MWCNN_model()
+                self.lbl_processing.config(text="MWCNN is not implemented yet")
                 raise NotImplementedError("MWCNN is not implemented yet")
             case "PRIDNet":
                 # model = PRIDNet_model()
+                self.lbl_processing.config(text="PRIDNet is not implemented yet")
                 raise NotImplementedError("PRIDNet is not implemented yet")
         augmentations = []
         for a in [k for k,v in self.augmentations.items() if v.get()]:
