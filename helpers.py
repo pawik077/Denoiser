@@ -14,7 +14,7 @@ def get_img_paths(datasets):
     # SIDD
     if 'SIDD' in datasets:
         sidd_dir = pathlib.Path(sidd_dir)
-        sidd_img_paths = list(sidd_dir.rglob('*.png'))
+        sidd_img_paths = list(sidd_dir.rglob('*.PNG'))
         sidd_img_paths = [str(path) for path in sidd_img_paths]
         for img in sidd_img_paths:
             img_type = img.split(os.path.sep)[-1].split('_')[0]
