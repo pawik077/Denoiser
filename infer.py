@@ -41,10 +41,7 @@ if __name__ == '__main__':
     model = tf.keras.models.load_model(f'./models/{model_name}.h5')
 
     # load data
-    sidd_dir = './datasets/SIDD'
-    renoir_dir = './datasets/RENOIR'
-    nind_dir = './datasets/NIND'
-    gt_paths, noisy_paths = get_img_paths(sidd_dir, renoir_dir, nind_dir)
+    gt_paths, noisy_paths = get_img_paths(['SIDD', 'RENOIR', 'NIND'])
 
     # load data
     choices = random.choices(range(len(gt_paths)), k=10)
