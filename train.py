@@ -23,7 +23,7 @@ def train(model: tf.keras.Model, datasets, augmentations,  filename: str, epochs
     test_set = augmentation.dataset_generator(x=noisy_test_imgs, y=gt_test_imgs, batch_size=4, augmentations=None)
 
     #train model
-    model_path = f'./models/{filename}.h5'
+    model_path = f'./models/{filename}'
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', verbose=1, min_delta=0.0001, patience=10),
         tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', mode='min', factor=0.8, patience=3, verbose=1, min_lr=1e-6, min_delta=0.0001),
@@ -37,4 +37,4 @@ def train(model: tf.keras.Model, datasets, augmentations,  filename: str, epochs
 
 if __name__ == '__main__':
     # for testing purposes
-    train(REDNet_model(), ['SIDD', 'RENOIR', 'NIND'], [augmentation.up_down_flip, augmentation.left_right_flip, augmentation.rotate], 'REDNet')
+    train(REDNet_model(), ['SIDD', 'RENOIR', 'NIND'], [augmentation.up_down_flip, augmentation.left_right_flip, augmentation.rotate], 'REDNet.h5')
