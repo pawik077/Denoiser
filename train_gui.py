@@ -53,7 +53,7 @@ class GUI(tk.Tk):
 
         self.lbl_epochs = ttk.Label(self.frm_epochs, text="Epochs:")
         self.lbl_epochs.pack()
-        self.ent_epochs = ttk.Entry(self.frm_epochs)
+        self.ent_epochs = ttk.Entry(self.frm_epochs, validate="key", validatecommand=(self.register(lambda P: str.isdigit(P) or P == ""), "%P"))
         self.ent_epochs.insert(0, 200)
         self.ent_epochs.pack()
 
