@@ -32,14 +32,9 @@ def get_img_paths(datasets):
                     continue
                 img_paths = list(batch.glob('*.bmp'))
                 img_paths = [str(path) for path in img_paths]
-                ref = [x for x in img_paths if 'Reference' in x.split(os.path.sep)[-1].split('.')[0]][0]
-                noisies = 0
-                for img in img_paths:
-                    if 'Noisy' in img.split(os.path.sep)[-1].split('.')[0]:
-                        noisy.append(img)
-                        noisies += 1
-                for _ in range(noisies):
-                    gts.append(ref)
+                noisies = [x for x in img_paths if 'Noisy' in x.split(os.path.sep)[-1]]
+                gts.append([x for x in img_paths if 'Reference' in x.split(os.path.sep)[-1]][0])
+                noisy.append(noisies[np.argmax([int(re.search(r"(?<=IMG_)(.*)(?=N)", x)[0]) for x in noisies])]) # insert skull emoji here
 
     # #NIND
     if 'NIND' in datasets:
