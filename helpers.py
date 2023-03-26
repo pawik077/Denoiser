@@ -38,29 +38,25 @@ def get_img_paths(datasets):
 
     # #NIND
     if 'NIND' in datasets:
-        # nind_dir = pathlib.Path(nind_dir)
-        # nind_img_paths = list(nind_dir.rglob('*.png'))
-        # nind_img_paths.extend(list(nind_dir.rglob('*.jpg')))
-        # nind_img_paths = [str(path) for path in nind_img_paths]
-        # for img in nind_img_paths:
-        #     img_name = img.split(os.path.sep)[-1]
-        #     iso = re.search('(?<=ISO).*?(?=[\.-])', img_name)[0]
-        #     if 'H' in iso:
-        #         noisy.append(img)
-        #     elif int(iso) > 4000:
-        #         noisy.append(img) 
-        #     else:
-        #         gts.append(img)
-
-        # #NIND
-        # nind_dir = pathlib.Path(nind_dir)
-        # for batch in nind_dir.iterdir():
-        #     img_paths = list(batch.glob('*.png'))
-        #     img_paths.extend(list(batch.glob('*.jpg')))
-        #     img_paths = [str(path) for path in img_paths]
-        # to be continued
-        
-        pass
+        nind_dir = pathlib.Path(nind_dir)
+        for batch in nind_dir.iterdir():
+            img_paths = list(batch.glob('*.png'))
+            img_paths.extend(list(batch.glob('*.jpg')))
+            img_paths = [str(path) for path in img_paths]
+            isos = [re.search('(?<=ISO).*?(?=[\.-])', x)[0] for x in img_paths]
+            ref = np.argmin([int(x) if x.isdigit() else 9999999 for x in isos])
+            if 'H4' in isos:
+                noisiest = isos.index('H4')
+            elif 'H3' in isos:
+                noisiest = isos.index('H3')
+            elif 'H2' in isos:
+                noisiest = isos.index('H2')
+            elif 'H1' in isos:
+                noisiest = isos.index('H1')
+            else:
+                noisiest = np.argmax([int(x) for x in isos])
+            gts.append(img_paths[ref])
+            noisy.append(img_paths[noisiest])
     
     gts_array = np.asarray(gts)
     noisy_array = np.asarray(noisy)
