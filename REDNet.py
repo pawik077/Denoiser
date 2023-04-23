@@ -5,7 +5,7 @@ import augmentation
 from helpers import *
 
 def REDNet_model():
-    input = tf.keras.layers.Input(shape=(256, 256, 3), name='input')
+    input = tf.keras.layers.Input(shape=(None, None, 3), name='input')
     conv1 = tf.keras.layers.Conv2D(filters=256, kernel_size=2, padding='same', name='conv1')(input)
     conv2 = tf.keras.layers.Conv2D(filters=256, kernel_size=2, padding='same', name='conv2')(conv1)
     conv3 = tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', name='conv3')(conv2)

@@ -34,19 +34,3 @@ def adjust_contrast(image, label):
 def adjust_saturation(image, label):
 	image = tf.image.random_saturation([image, label], 1, 5)
 	return image, label
-
-def dataset_generator(x, y, batch_size=32, augmentations=None):
-	# x: noisy images
-	# y: clean images
-	# augmentations: list of augmentation functions
-	# returns: dataset with augmentations
-	dataset = tf.data.Dataset.from_tensor_slices((x, y))
-	if augmentations:
-		for f in augmentations:
-			if np.random.uniform() < 0.5:
-				dataset = dataset.map(f, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-	dataset = dataset.repeat()
-	dataset = dataset.batch(batch_size, drop_remainder=True)
-	dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-	return dataset

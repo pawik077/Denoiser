@@ -2,14 +2,17 @@ import pathlib
 import re
 import numpy as np
 import os
-import cv2 as cv
+import shutil
+import sklearn.model_selection as sk
+# import cv2 as cv
+import tensorflow as tf
 
 def get_img_paths(datasets):
     gts = []
     noisy = []
-    sidd_dir = './datasets/SIDD'
-    renoir_dir = './datasets/RENOIR'
-    nind_dir = './datasets/NIND'
+    sidd_dir = './datasets_full/SIDD'
+    renoir_dir = './datasets_full/RENOIR'
+    nind_dir = './datasets_full/NIND'
 
     # SIDD
     if 'SIDD' in datasets:
@@ -62,11 +65,47 @@ def get_img_paths(datasets):
     noisy_array = np.asarray(noisy)
     return gts_array, noisy_array
 
-def load_images(img_paths):
-    images = []
-    for path in img_paths:
-        img = cv.imread(path)
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB) # openCV reads images in BGR format, convert to RGB for nn and plotting
-        img = cv.resize(img, (256, 256))
-        images.append(img)
-    return np.asarray(images)
+def link_imgs(datasets):
+    gt_paths, noisy_paths = get_img_paths(datasets)
+    gt_paths_train, gt_paths_test, noisy_paths_train, noisy_paths_test = sk.train_test_split(gt_paths, noisy_paths, test_size=0.2)
+    os.makedirs('./datasets/gts', exist_ok=True)
+    os.makedirs('./datasets/noisy', exist_ok=True)
+    os.makedirs('./datasets/gts_test', exist_ok=True)
+    os.makedirs('./datasets/noisy_test', exist_ok=True)
+    for i, (gt, n) in enumerate(zip(gt_paths_train, noisy_paths_train)):
+        os.symlink(os.path.abspath(gt), os.path.join('./datasets/gts', f'{i}.{gt.split(".")[-1]}'))
+        os.symlink(os.path.abspath(n), os.path.join('./datasets/noisy', f'{i}.{n.split(".")[-1]}'))
+    for i, (gt, n) in enumerate(zip(gt_paths_test, noisy_paths_test)):
+        os.symlink(os.path.abspath(gt), os.path.join('./datasets/gts_test', f'{i}.{gt.split(".")[-1]}'))
+        os.symlink(os.path.abspath(n), os.path.join('./datasets/noisy_test', f'{i}.{n.split(".")[-1]}'))
+    return len(gt_paths_train), len(gt_paths_test)
+
+def remove_links():
+    shutil.rmtree('./datasets/')
+
+def generate_dataset(datasets, batch_size=1, augmentations=None):
+    train_length, test_length =  link_imgs(datasets)
+    train_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    train_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    train_dataset = tf.data.Dataset.zip((train_dataset_noisy, train_dataset_gts))
+    test_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    test_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    test_dataset = tf.data.Dataset.zip((test_dataset_noisy, test_dataset_gts))
+    if augmentations:
+        for f in augmentations:
+            if np.random.uniform() < 0.5:
+                train_dataset = train_dataset.map(f, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+
+    train_dataset = train_dataset.repeat()
+    test_dataset = test_dataset.repeat()
+    train_dataset = train_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    return train_dataset, test_dataset, train_length, test_length
+
+if __name__ == '__main__':
+    datasets = ['SIDD', 'RENOIR', 'NIND']
+    train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets)
+    print(train_length)
+    print(test_length)
+
+    remove_links()

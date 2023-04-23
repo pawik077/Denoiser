@@ -1,5 +1,6 @@
 __pycache__
 .env
 datasets
+datasets_full
 models
 results
