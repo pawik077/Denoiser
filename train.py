@@ -5,8 +5,8 @@ from helpers import *
 import augmentation
 from REDNet import REDNet_model
 
-def train(model: tf.keras.Model, datasets, augmentations,  filename: str, epochs: int = 200):
-    train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets, augmentations=augmentations)
+def train(model: tf.keras.Model, datasets, augmentations, filename: str, batch_size: int = 1, epochs: int = 200):
+    train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets, batch_size=batch_size, augmentations=augmentations)
 
     #train model
     model_path = f'./models/{filename}'
@@ -16,7 +16,7 @@ def train(model: tf.keras.Model, datasets, augmentations,  filename: str, epochs
         tf.keras.callbacks.ModelCheckpoint(filepath=model_path, monitor='val_loss', mode='min', save_best_only=True, save_weights_only=False, frequency='epoch'),      
     ]
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4), loss=tf.keras.losses.MeanSquaredError(), metrics=[tf.keras.metrics.MeanSquaredError()])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=epochs, steps_per_epoch=train_length, validation_steps=test_length, verbose=1, callbacks=callbacks)
+    model.fit(train_dataset, validation_data=test_dataset, epochs=epochs, steps_per_epoch=np.ceil(train_length/batch_size), validation_steps=np.ceil(test_length/batch_size), verbose=1, callbacks=callbacks)
     #save model
     model.save(model_path)
 

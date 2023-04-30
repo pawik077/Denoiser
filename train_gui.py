@@ -11,7 +11,7 @@ class GUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("GUI")
-        self.geometry("330x230")
+        self.geometry("330x270")
         self.datasets = {
             "SIDD": tk.BooleanVar(value=True),
             "RENOIR": tk.BooleanVar(value=True),
@@ -57,8 +57,17 @@ class GUI(tk.Tk):
         self.ent_epochs.insert(0, 200)
         self.ent_epochs.pack()
 
+        self.frm_batch_size = tk.Frame(self)
+        self.frm_batch_size.place(x=7, y=120)
+
+        self.lbl_batch_size = ttk.Label(self.frm_batch_size, text="Batch size:")
+        self.lbl_batch_size.pack()
+        self.ent_batch_size = ttk.Entry(self.frm_batch_size, validate="key", validatecommand=(self.register(lambda P: str.isdigit(P) or P == ""), "%P"))
+        self.ent_batch_size.insert(0, 1)
+        self.ent_batch_size.pack()
+
         self.frm_datasets = tk.Frame(self)
-        self.frm_datasets.place(x=0, y=120)
+        self.frm_datasets.place(x=0, y=160)
 
         self.lbl_datasets = ttk.Label(self.frm_datasets, text="Datasets:")
         self.lbl_datasets.pack()
@@ -66,10 +75,10 @@ class GUI(tk.Tk):
         for _, cb in enumerate(self.cbs_datasets): cb.pack(anchor=tk.W)
 
         self.btn_train = ttk.Button(self, text="Train", command=self.train_trigger, )
-        self.btn_train.place(x=85, y=140)
+        self.btn_train.place(x=85, y=180)
 
         self.btn_debug = ttk.Button(self, text="Debug", command=self.debug)
-        self.btn_debug.place(x=85, y=170)
+        self.btn_debug.place(x=85, y=210)
         
         self.frm_augment = tk.Frame(self)
         self.frm_augment.place(x=180, y=0)
@@ -80,13 +89,14 @@ class GUI(tk.Tk):
         for _, cb in enumerate(self.cbs_augment): cb.pack(anchor=tk.W)
         
         self.lbl_processing = ttk.Label(self, text='')
-        self.lbl_processing.place(x=7, y=210)
+        self.lbl_processing.place(x=7, y=250)
 
     def train_trigger(self):
         self.lbl_processing.config(text="Training model (consult terminal)...")
         self.update()
         datasets = [k for k,v in self.datasets.items() if v.get()]
         filename = self.ent_filename.get()
+        batch_size = int(self.ent_batch_size.get())
         epochs = int(self.ent_epochs.get())
         match self.cbb_model.get():
             case "REDNet":
@@ -116,7 +126,7 @@ class GUI(tk.Tk):
                     augmentations.append(augmentation.adjust_contrast)
                 case "Adjust saturation":
                     augmentations.append(augmentation.adjust_saturation)
-        train(model, datasets, augmentations, filename, epochs)
+        train(model, datasets, augmentations, filename, batch_size, epochs)
         self.lbl_processing.config(text="Done!")
         self.update()
 
