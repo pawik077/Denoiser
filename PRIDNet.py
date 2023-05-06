@@ -1,7 +1,7 @@
 import tensorflow as tf
 from helpers import *
 
-class Conv_block(tf.keras.layers.Layer):
+class Convolution_block(tf.keras.layers.Layer):
     def __init__(self, filters=64, kernel_size=(3,3), **kwargs):
         super().__init__(*kwargs)
         self.filters = filters
@@ -245,7 +245,7 @@ class Kernel_selecting_module(tf.keras.layers.Layer):
 def PRIDNet_model():
     input = tf.keras.layers.Input(shape=(None, None, 3))
 
-    conv = Conv_block()(input)
+    conv = Convolution_block()(input)
     
     ca = Channel_attention()(conv)
     ca = tf.keras.layers.Conv2D(filters=3, kernel_size=(3,3), strides=1, padding='same')(ca)

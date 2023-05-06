@@ -20,7 +20,7 @@ class Conv_block(tf.keras.layers.Layer):
     def get_config(self):
         config = super().get_config().copy()
         config.update({
-            'num_filters': self.filters,
+            'filters': self.filters,
             'kernel_size': self.kernel_size,
         })
         return config
