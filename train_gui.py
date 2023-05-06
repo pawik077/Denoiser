@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from train import train
 from REDNet import REDNet_model
+from MWCNN import MWCNN_model
+from PRIDNet import PRIDNet_model
 import augmentation
 
 models = ["REDNet", "MWCNN", "PRIDNet"]
@@ -102,13 +104,9 @@ class GUI(tk.Tk):
             case "REDNet":
                 model = REDNet_model()
             case "MWCNN":
-                # model = MWCNN_model()
-                self.lbl_processing.config(text="MWCNN is not implemented yet")
-                raise NotImplementedError("MWCNN is not implemented yet")
+                model = MWCNN_model()
             case "PRIDNet":
-                # model = PRIDNet_model()
-                self.lbl_processing.config(text="PRIDNet is not implemented yet")
-                raise NotImplementedError("PRIDNet is not implemented yet")
+                model = PRIDNet_model()
         augmentations = []
         for a in [k for k,v in self.augmentations.items() if v.get()]:
             match a:

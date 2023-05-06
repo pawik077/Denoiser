@@ -19,6 +19,7 @@ def train(model: tf.keras.Model, datasets, augmentations, filename: str, batch_s
     model.fit(train_dataset, validation_data=test_dataset, epochs=epochs, steps_per_epoch=np.ceil(train_length/batch_size), validation_steps=np.ceil(test_length/batch_size), verbose=1, callbacks=callbacks)
     #save model
     model.save(model_path)
+    remove_links()
 
 if __name__ == '__main__':
     # for testing purposes
