@@ -3,7 +3,7 @@ from helpers import *
 
 class Convolution_block(tf.keras.layers.Layer):
     def __init__(self, filters=64, kernel_size=(3,3), **kwargs):
-        super().__init__(*kwargs)
+        super().__init__(**kwargs)
         self.filters = filters
         self.kernel_size = kernel_size
 
@@ -33,7 +33,7 @@ class Convolution_block(tf.keras.layers.Layer):
     
 class Channel_attention(tf.keras.layers.Layer):
     def __init__(self, C=64, **kwargs):
-        super().__init__(*kwargs)
+        super().__init__(**kwargs)
         self.C = C
         self.gap = tf.keras.layers.GlobalAveragePooling2D()
         self.dense_middle = tf.keras.layers.Dense(units=2, activation='relu')
