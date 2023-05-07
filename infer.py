@@ -87,6 +87,8 @@ if __name__ == '__main__':
         model = tf.keras.models.load_model(f'./models/{model_name}.h5', custom_objects={'DWT_downsampling': DWT_downsampling, 'IWT_upsampling': IWT_upsampling, 'Conv_block': Conv_block})
     elif 'PRIDNet' in model_name:
         model = tf.keras.models.load_model(f'./models/{model_name}.h5', custom_objects={'Convolution_block': Convolution_block, 'Channel_attention': Channel_attention, 'Avg_pool_Unet_Upsample_msfe': Avg_pool_Unet_Upsample_msfe, 'Multi_scale_feature_extraction': Multi_scale_feature_extraction, 'Kernel_selecting_module': Kernel_selecting_module})
+    elif model_name == 'nlm':
+        model = None
     else:
         raise ValueError('Model not recognized')
     
@@ -98,8 +100,11 @@ if __name__ == '__main__':
     else:
         number = 1
         noisy_images = load_images([file])
-
-    denoised_images = infer(model, noisy_images)
+    
+    if model_name != 'nlm':
+        denoised_images = infer(model, noisy_images)
+    else:
+        denoised_images = np.asarray([cv.fastNlMeansDenoisingColored(noisy_images[i], None, 10, 10, 7, 21) for i in range(len(noisy_images))])
 
     if rand:
         psnr_gt_mean = np.mean([psnr(gt_images[i], noisy_images[i]) for i in range(len(gt_images))])
