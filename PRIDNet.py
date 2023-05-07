@@ -12,6 +12,14 @@ class Convolution_block(tf.keras.layers.Layer):
         self.conv3 = tf.keras.layers.Conv2D(filters=self.filters, kernel_size=self.kernel_size, strides=1, padding='same')
         self.conv4 = tf.keras.layers.Conv2D(filters=self.filters, kernel_size=self.kernel_size, strides=1, padding='same')
 
+    def get_config(self):
+        config = super().get_config().copy()
+        config.update({
+            'filters': self.filters,
+            'kernel_size': self.kernel_size,
+        })
+        return config
+
     def call(self, x):
         x = self.conv1(x)
         x = tf.nn.relu(x)
@@ -29,7 +37,7 @@ class Channel_attention(tf.keras.layers.Layer):
         self.C = C
         self.gap = tf.keras.layers.GlobalAveragePooling2D()
         self.dense_middle = tf.keras.layers.Dense(units=2, activation='relu')
-        self.dense_end = tf.keras.layers.Dense(units=C, activation='sigmoid')
+        self.dense_end = tf.keras.layers.Dense(units=self.C, activation='sigmoid')
 
     def get_config(self):
         config = super().get_config().copy()
@@ -42,7 +50,8 @@ class Channel_attention(tf.keras.layers.Layer):
         v = self.gap(x)
         fc1 = self.dense_middle(v)
         mu = self.dense_end(fc1)
-        U_out = tf.multiply(x, mu)
+        # U_out = tf.multiply(x, mu)
+        U_out = tf.keras.layers.Multiply()([x, mu])
         return U_out
 
 class Avg_pool_Unet_Upsample_msfe(tf.keras.layers.Layer):
