@@ -38,7 +38,7 @@ def get_img_paths(datasets):
                 img_paths = [str(path) for path in img_paths]
                 noisies = [x for x in img_paths if 'Noisy' in x.split(os.path.sep)[-1]]
                 gts.append([x for x in img_paths if 'Reference' in x.split(os.path.sep)[-1]][0])
-                noisy.append(noisies[np.argmax([int(re.search(r"(?<=IMG_)(.*)(?=N)", x)[0]) for x in noisies])]) # insert skull emoji here
+                noisy.append(noisies[np.argmax([int(re.search('(?<=IMG_)(.*)(?=N)', x)[0]) for x in noisies])]) # insert skull emoji here
 
     # #NIND
     if 'NIND' in datasets:
@@ -113,7 +113,7 @@ def generate_dataset(datasets, batch_size=1, augmentations=None):
     return train_dataset, test_dataset, train_length, test_length
 
 if __name__ == '__main__':
-    datasets = ['SIDD', 'RENOIR', 'NIND']
+    datasets = ['RENOIR']
     train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets)
     print(train_length)
     print(test_length)
