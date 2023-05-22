@@ -13,6 +13,7 @@ def get_img_paths(datasets):
     sidd_dir = './datasets_full/SIDD'
     renoir_dir = './datasets_full/RENOIR'
     nind_dir = './datasets_full/NIND'
+    polyu_dir = './datasets_full/PolyU'
 
     # SIDD
     if 'SIDD' in datasets:
@@ -60,6 +61,15 @@ def get_img_paths(datasets):
                 noisiest = np.argmax([int(x) for x in isos])
             gts.append(img_paths[ref])
             noisy.append(img_paths[noisiest])
+
+    # PolyU
+    if 'PolyU' in datasets:
+        polyu_dir = pathlib.Path(polyu_dir)
+        for img in polyu_dir.iterdir():
+            if 'mean' in img.name: # someday I'll be living in a big old city and all you're ever gonna be is mean (with apologies to Taylor Swift)
+                gts.append(str(img))
+            elif 'Real' in img.name:
+                noisy.append(str(img))
     
     gts_array = np.asarray(gts)
     noisy_array = np.asarray(noisy)
