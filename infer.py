@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import random
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import mean_squared_error as mse
 import sys
 import getopt
 
@@ -111,6 +112,8 @@ if __name__ == '__main__':
         psnr_denoised_mean = np.mean([psnr(gt_images[i], denoised_images[i]) for i in range(len(gt_images))])
         ssim_gt_mean = np.mean([ssim(gt_images[i], noisy_images[i], channel_axis=-1, data_range=noisy_images[i].max() - noisy_images[i].min()) for i in range(len(gt_images))])
         ssim_denoised_mean = np.mean([ssim(gt_images[i], denoised_images[i], channel_axis=-1, data_range=denoised_images[i].max() - denoised_images[i].min()) for i in range(len(gt_images))])
+        mse_gt_mean = np.mean([mse(gt_images[i], noisy_images[i]) for i in range(len(gt_images))])
+        mse_denoised_mean = np.mean([mse(gt_images[i], denoised_images[i]) for i in range(len(gt_images))])
         print(f'PSNR (GT): {psnr_gt_mean}')
         print(f'PSNR (Denoised): {psnr_denoised_mean}')
         print(f'SSIM (GT): {ssim_gt_mean}')
