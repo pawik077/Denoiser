@@ -58,7 +58,7 @@ def single_test(gt_path, noisy_path):
     denoised_image_rednet = infer(rednet_model, noisy_image)[0]
     denoised_image_mwcnn = infer(mwcnn_model, noisy_image)[0]
     denoised_image_pridnet = infer(pridnet_model, noisy_image)[0]
-    denoised_image_nlm = cv.fastNlMeansDenoisingColored(noisy_image[i], None, 10, 10, 7, 21)
+    denoised_image_nlm = cv.fastNlMeansDenoisingColored(noisy_image, None, 10, 10, 7, 21)
 
     psnr_gt = psnr(gt_image, noisy_image)
     psnr_rednet = psnr(gt_image, denoised_image_rednet)
