@@ -34,11 +34,11 @@ def full_test():
     psnr_pridnet_mean = np.mean([psnr(gt_imgs[i], denoised_imgs_pridnet[i]) for i in range(len(gt_imgs))])
     psnr_nlm_mean = np.mean([psnr(gt_imgs[i], denoised_imgs_nlm[i]) for i in range(len(gt_imgs))])
 
-    ssim_gt_mean = np.mean([ssim(gt_imgs[i], noisy_imgs[i], multichannel=True) for i in range(len(gt_imgs))])
-    ssim_rednet_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_rednet[i], multichannel=True) for i in range(len(gt_imgs))])
-    ssim_mwcnn_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_mwcnn[i], multichannel=True) for i in range(len(gt_imgs))])
-    ssim_pridnet_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_pridnet[i], multichannel=True) for i in range(len(gt_imgs))])
-    ssim_nlm_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_nlm[i], multichannel=True) for i in range(len(gt_imgs))])
+    ssim_gt_mean = np.mean([ssim(gt_imgs[i], noisy_imgs[i], channel_axis=-1, data_range=noisy_imgs[i].max() - noisy_imgs[i].min()) for i in range(len(gt_imgs))])
+    ssim_rednet_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_rednet[i], channel_axis=-1, data_range=denoised_imgs_rednet[i].max() - denoised_imgs_rednet[i].min()) for i in range(len(gt_imgs))])
+    ssim_mwcnn_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_mwcnn[i], channel_axis=-1, data_range=denoised_imgs_mwcnn[i].max() - denoised_imgs_mwcnn[i].min()) for i in range(len(gt_imgs))])
+    ssim_pridnet_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_pridnet[i], channel_axis=-1, data_range=denoised_imgs_pridnet[i].max() - denoised_imgs_pridnet[i].min()) for i in range(len(gt_imgs))])
+    ssim_nlm_mean = np.mean([ssim(gt_imgs[i], denoised_imgs_nlm[i], channel_axis=-1, data_range=denoised_imgs_nlm[i].max() - denoised_imgs_nlm[i].min()) for i in range(len(gt_imgs))])
 
     mse_gt_mean = np.mean([mse(gt_imgs[i], noisy_imgs[i]) for i in range(len(gt_imgs))])
     mse_rednet_mean = np.mean([mse(gt_imgs[i], denoised_imgs_rednet[i]) for i in range(len(gt_imgs))])
@@ -66,11 +66,11 @@ def single_test(gt_path, noisy_path):
     psnr_pridnet = psnr(gt_image, denoised_image_pridnet)
     psnr_nlm = psnr(gt_image, denoised_image_nlm)
 
-    ssim_gt = ssim(gt_image, noisy_image, multichannel=True)
-    ssim_rednet = ssim(gt_image, denoised_image_rednet, multichannel=True)
-    ssim_mwcnn = ssim(gt_image, denoised_image_mwcnn, multichannel=True)
-    ssim_pridnet = ssim(gt_image, denoised_image_pridnet, multichannel=True)
-    ssim_nlm = ssim(gt_image, denoised_image_nlm, multichannel=True)
+    ssim_gt = ssim(gt_image, noisy_image, channel_axis=-1, data_range=noisy_image.max() - noisy_image.min())
+    ssim_rednet = ssim(gt_image, denoised_image_rednet, channel_axis=-1, data_range=denoised_image_rednet.max() - denoised_image_rednet.min())
+    ssim_mwcnn = ssim(gt_image, denoised_image_mwcnn, channel_axis=-1, data_range=denoised_image_mwcnn.max() - denoised_image_mwcnn.min())
+    ssim_pridnet = ssim(gt_image, denoised_image_pridnet, channel_axis=-1, data_range=denoised_image_pridnet.max() - denoised_image_pridnet.min())
+    ssim_nlm = ssim(gt_image, denoised_image_nlm, channel_axis=-1, data_range=denoised_image_nlm.max() - denoised_image_nlm.min())
 
     mse_gt = mse(gt_image, noisy_image)
     mse_rednet = mse(gt_image, denoised_image_rednet)
