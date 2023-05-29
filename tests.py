@@ -91,9 +91,9 @@ if __name__ == "__main__":
     file = None
 
     for o,a in opts,args:
-        if o in ('a', '--all'):
+        if o in ('-a', '--all'):
             all = True
-        elif o in ('s', '--single'):
+        elif o in ('-s', '--single'):
             single = True
         elif o in ('-f', '--file'):
             file = a
