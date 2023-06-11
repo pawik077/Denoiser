@@ -18,7 +18,7 @@ def load_images(paths):
     for path in paths:
         img = cv.imread(path)
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        img = cv.resize(img, (256, 256))
+        img = cv.resize(img, (512, 512))
         imgs.append(img)
     return np.asarray(imgs, dtype=np.uint8)
 

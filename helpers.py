@@ -95,11 +95,11 @@ def remove_links():
 
 def generate_dataset(datasets, batch_size=1, augmentations=None):
     train_length, test_length =  link_imgs(datasets)
-    train_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
-    train_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    train_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
+    train_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
     train_dataset = tf.data.Dataset.zip((train_dataset_noisy, train_dataset_gts))
-    test_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
-    test_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(256, 256), shuffle=False, interpolation='bilinear', follow_links=True)
+    test_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
+    test_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy_test', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
     test_dataset = tf.data.Dataset.zip((test_dataset_noisy, test_dataset_gts))
     if augmentations:
         for f in augmentations:
