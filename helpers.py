@@ -8,6 +8,9 @@ import sklearn.model_selection as sk
 import tensorflow as tf
 
 def get_img_paths(datasets):
+    '''Returns a list of paths to ground truth and noisy images from the specified datasets
+    Args:
+        datasets: list of strings, each string is the name of a dataset'''
     gts = []
     noisy = []
     sidd_dir = './datasets_full/SIDD'
@@ -76,6 +79,12 @@ def get_img_paths(datasets):
     return gts_array, noisy_array
 
 def link_imgs(datasets):
+    '''Creates symlinks to the images in the specified datasets
+    Args:
+        datasets: list of strings, each string is the name of a dataset
+    Returns:
+        int, number of images in the training set
+        int, number of images in the test set'''
     gt_paths, noisy_paths = get_img_paths(datasets)
     gt_paths_train, gt_paths_test, noisy_paths_train, noisy_paths_test = sk.train_test_split(gt_paths, noisy_paths, test_size=0.2)
     os.makedirs('./datasets/gts', exist_ok=True)
@@ -91,9 +100,20 @@ def link_imgs(datasets):
     return len(gt_paths_train), len(gt_paths_test)
 
 def remove_links():
+    '''Removes the symlinks created by link_imgs'''
     shutil.rmtree('./datasets/')
 
 def generate_dataset(datasets, batch_size=1, augmentations=None):
+    '''Generates a tf.data.Dataset from the specified datasets
+    Args:
+        datasets: list of strings, each string is the name of a dataset
+        batch_size: int, batch size
+        augmentations: list of functions, each function is an augmentation to be applied to the dataset
+    Returns:
+        train_dataset: tf.data.Dataset, training dataset
+        test_dataset: tf.data.Dataset, testing dataset
+        train_length: int, number of training images
+        test_length: int, number of testing images'''
     train_length, test_length =  link_imgs(datasets)
     train_dataset_gts = tf.keras.utils.image_dataset_from_directory('datasets/gts', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
     train_dataset_noisy = tf.keras.utils.image_dataset_from_directory('datasets/noisy', label_mode=None, color_mode='rgb', batch_size=batch_size, image_size=(512, 512), shuffle=False, interpolation='bilinear', follow_links=True)
@@ -113,7 +133,7 @@ def generate_dataset(datasets, batch_size=1, augmentations=None):
     return train_dataset, test_dataset, train_length, test_length
 
 if __name__ == '__main__':
-    datasets = ['RENOIR']
+    datasets = ['SIDD', 'RENOIR', 'NIND', 'PolyU']
     train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets)
     print(train_length)
     print(test_length)

@@ -6,6 +6,14 @@ import augmentation
 from REDNet import REDNet_model
 
 def train(model: tf.keras.Model, datasets, augmentations, filename: str, batch_size: int = 1, epochs: int = 200):
+    '''Trains the model on the given datasets and saves the model to the given filename
+    Args:
+        model: the model to train
+        datasets: a list of datasets to train on
+        augmentations: a list of augmentations to apply to the training data
+        filename: the filename to save the model to
+        batch_size: the batch size to use for training
+        epochs: the number of epochs to train for'''
     train_dataset, test_dataset, train_length, test_length = generate_dataset(datasets, batch_size=batch_size, augmentations=augmentations)
 
     #train model

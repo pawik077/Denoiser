@@ -14,6 +14,11 @@ from MWCNN import DWT_downsampling, IWT_upsampling, Conv_block
 from PRIDNet import Convolution_block, Channel_attention, Avg_pool_Unet_Upsample_msfe, Multi_scale_feature_extraction, Kernel_selecting_module
 
 def load_images(paths):
+    '''Loads images from the specified paths
+    Args:
+        paths: list of strings, each string is a path to an image
+    Returns:
+        imgs: numpy array of shape (len(paths), 512, 512, 3)'''
     imgs = []
     for path in paths:
         img = cv.imread(path)
@@ -23,11 +28,23 @@ def load_images(paths):
     return np.asarray(imgs, dtype=np.uint8)
 
 def infer(model: tf.keras.Model, noisy_imgs: np.ndarray):
+    '''Infer denoised images from noisy images
+    Args:
+        model: tf.keras.Model, the model to use for inference
+        noisy_imgs: numpy array of shape (len(paths), 512, 512, 3), the noisy images
+    Returns:
+        denoised_imgs: numpy array of shape (len(paths), 512, 512, 3), the denoised images'''
     denoised_imgs = model.predict(noisy_imgs, batch_size=4)
     denoised_imgs = np.asarray([(255.0*(x - np.min(x))/np.ptp(x)).astype(np.uint8) for x in denoised_imgs])
     return denoised_imgs
 
 def visualize(noisy_img: np.ndarray, denoised_img: np.ndarray, clean_img: np.ndarray = None, name: str = None):
+    '''Visualize the noisy, denoised, and clean images as a 1x3 grid of images
+    Args:
+        noisy_img: numpy array of shape (512, 512, 3), the noisy image
+        denoised_img: numpy array of shape (512, 512, 3), the denoised image
+        clean_img: numpy array of shape (512, 512, 3), the clean image
+        name: string, the name of the image to save'''
     fig, axs = plt.subplots(1, 3)
     axs[0].imshow(noisy_img)
     axs[0].set_title('Noisy')
