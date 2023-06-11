@@ -34,7 +34,7 @@ def infer(model: tf.keras.Model, noisy_imgs: np.ndarray):
         noisy_imgs: numpy array of shape (len(paths), 512, 512, 3), the noisy images
     Returns:
         denoised_imgs: numpy array of shape (len(paths), 512, 512, 3), the denoised images'''
-    denoised_imgs = model.predict(noisy_imgs, batch_size=4)
+    denoised_imgs = model.predict(noisy_imgs, batch_size=1)
     denoised_imgs = np.asarray([(255.0*(x - np.min(x))/np.ptp(x)).astype(np.uint8) for x in denoised_imgs])
     return denoised_imgs
 
