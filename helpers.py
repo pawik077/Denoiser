@@ -21,14 +21,10 @@ def get_img_paths(datasets):
     # SIDD
     if 'SIDD' in datasets:
         sidd_dir = pathlib.Path(sidd_dir)
-        sidd_img_paths = list(sidd_dir.rglob('*.PNG'))
-        sidd_img_paths = [str(path) for path in sidd_img_paths]
-        for img in sidd_img_paths:
-            img_type = img.split(os.path.sep)[-1].split('_')[0]
-            if img_type == 'GT':
-                gts.append(img)
-            elif img_type == 'NOISY':
-                noisy.append(img)
+        sidd_dir_data = sidd_dir / 'Data'
+        pairs = [list(x.iterdir()) for x in sidd_dir_data.iterdir()]
+        gts.extend([str(x) for pair in pairs for x in pair if 'GT' in x.name])
+        noisy.extend([str(x) for pair in pairs for x in pair if 'NOISY' in x.name])
 
     # Renoir
     if 'RENOIR' in datasets:
