@@ -33,8 +33,8 @@ def get_img_paths(datasets):
     # Renoir
     if 'RENOIR' in datasets:
         renoir_dir = pathlib.Path(renoir_dir)
-        for set in renoir_dir.iterdir():
-            for batch in set.iterdir():
+        for source in renoir_dir.iterdir():
+            for batch in source.iterdir():
                 if '.txt' in batch.name:
                     continue
                 img_paths = list(batch.glob('*.bmp'))
@@ -68,11 +68,11 @@ def get_img_paths(datasets):
     # PolyU
     if 'PolyU' in datasets:
         polyu_dir = pathlib.Path(polyu_dir)
-        for img in polyu_dir.iterdir():
-            if 'mean' in img.name: # someday I'll be living in a big old city and all you're ever gonna be is mean (with apologies to Taylor Swift)
-                gts.append(str(img))
-            elif 'Real' in img.name:
-                noisy.append(str(img))
+        groups = list(set([re.search('(.*)(?=_)', a.name).group(0) for a in list(polyu_dir.iterdir())]))
+        pairs = [list(polyu_dir.glob(f'*{group}*')) for group in groups]
+        gts.extend([str(x) for pair in pairs for x in pair if 'mean' in x.name])
+        noisy.extend([str(x) for pair in pairs for x in pair if 'Real' in x.name])
+
     
     gts_array = np.asarray(gts)
     noisy_array = np.asarray(noisy)
