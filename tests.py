@@ -8,6 +8,7 @@ from skimage.metrics import mean_squared_error as mse
 
 import sys
 import getopt
+import random
 
 from helpers import *
 from infer import load_images, infer
@@ -75,6 +76,21 @@ def full_test(datasets):
         f.write(f'MWCNN,{psnr_mwcnn_mean},{ssim_mwcnn_mean},{mse_mwcnn_mean}\n')
         f.write(f'PRIDNet,{psnr_pridnet_mean},{ssim_pridnet_mean},{mse_pridnet_mean}\n')
         f.write(f'NLM,{psnr_nlm_mean},{ssim_nlm_mean},{mse_nlm_mean}\n')
+
+    choices = random.choices(range(len(gt_imgs)), k=5)
+    for i in choices:
+        gt_img = cv.cvtColor(gt_imgs[i], cv.COLOR_RGB2BGR)
+        noisy_img = cv.cvtColor(noisy_imgs[i], cv.COLOR_RGB2BGR)
+        denoised_img_rednet = cv.cvtColor(denoised_imgs_rednet[i], cv.COLOR_RGB2BGR)
+        denoised_img_mwcnn = cv.cvtColor(denoised_imgs_mwcnn[i], cv.COLOR_RGB2BGR)
+        denoised_img_pridnet = cv.cvtColor(denoised_imgs_pridnet[i], cv.COLOR_RGB2BGR)
+        denoised_img_nlm = cv.cvtColor(denoised_imgs_nlm[i], cv.COLOR_RGB2BGR)
+        cv.imwrite(f'./test/{testname}img{i}_gt.png', gt_img)
+        cv.imwrite(f'./test/{testname}img{i}_noisy.png', noisy_img)
+        cv.imwrite(f'./test/{testname}img{i}_rednet.png', denoised_img_rednet)
+        cv.imwrite(f'./test/{testname}img{i}_mwcnn.png', denoised_img_mwcnn)
+        cv.imwrite(f'./test/{testname}img{i}_pridnet.png', denoised_img_pridnet)
+        cv.imwrite(f'./test/{testname}img{i}_nlm.png', denoised_img_nlm)
     print('Done!')
 
 def single_test(gt_path, noisy_path):
