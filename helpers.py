@@ -29,15 +29,10 @@ def get_img_paths(datasets):
     # Renoir
     if 'RENOIR' in datasets:
         renoir_dir = pathlib.Path(renoir_dir)
-        for source in renoir_dir.iterdir():
-            for batch in source.iterdir():
-                if '.txt' in batch.name:
-                    continue
-                img_paths = list(batch.glob('*.bmp'))
-                img_paths = [str(path) for path in img_paths]
-                noisies = [x for x in img_paths if 'Noisy' in x.split(os.path.sep)[-1]]
-                gts.append([x for x in img_paths if 'Reference' in x.split(os.path.sep)[-1]][0])
-                noisy.append(noisies[np.argmax([int(re.search('(?<=IMG_)(.*)(?=N)', x)[0]) for x in noisies])]) # insert skull emoji here
+        sources = list(renoir_dir.iterdir())
+        batches = [batch for source in sources for batch in source.iterdir() if batch.is_dir()]
+        gts.extend([str(x) for batch in batches for x in batch.iterdir() if 'Reference' in x.name])
+        noisy.extend([str(n[np.argmax([int(re.search('(?<=IMG_)(.*)(?=N)', x.name)[0]) for x in n])]) for n in [list(batch.glob('*Noisy.bmp')) for batch in batches]]) # insert skull emoji here
 
     # #NIND
     if 'NIND' in datasets:
