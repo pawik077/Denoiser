@@ -2,11 +2,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from train import train
 from REDNet import REDNet_model
+from DnCNN import DnCNN_model
 from MWCNN import MWCNN_model
 from PRIDNet import PRIDNet_model
 import augmentation
 
-models = ["REDNet", "MWCNN", "PRIDNet"]
+models = ["REDNet", "DnCNN", "MWCNN", "PRIDNet"]
 
 
 class GUI(tk.Tk):
@@ -103,6 +104,8 @@ class GUI(tk.Tk):
         match self.cbb_model.get():
             case "REDNet":
                 model = REDNet_model()
+            case "DnCNN":
+                model = DnCNN_model()
             case "MWCNN":
                 model = MWCNN_model()
             case "PRIDNet":
