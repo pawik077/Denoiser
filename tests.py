@@ -9,15 +9,17 @@ from skimage.metrics import mean_squared_error as mse
 import sys
 import getopt
 import random
+import pathlib
 
 from helpers import *
 from infer import load_images, infer
+from DnCNN import Conv_block_Dn, DnCNN
 from MWCNN import DWT_downsampling, IWT_upsampling, Conv_block
 from PRIDNet import Convolution_block, Channel_attention, Avg_pool_Unet_Upsample_msfe, Multi_scale_feature_extraction, Kernel_selecting_module
 
-def full_test(datasets):
+def full_test(datasets, number=None):
     rednet_model = tf.keras.models.load_model('./models/REDNet.h5')
-    dncnn_model = tf.keras.models.load_model('./models/DnCNN.h5')
+    dncnn_model = tf.keras.models.load_model('./models/DnCNN.h5', custom_objects={'Conv_block_Dn': Conv_block_Dn, 'DnCNN': DnCNN})
     mwcnn_model = tf.keras.models.load_model(f'./models/MWCNN.h5', custom_objects={'DWT_downsampling': DWT_downsampling, 'IWT_upsampling': IWT_upsampling, 'Conv_block': Conv_block})
     pridnet_model = tf.keras.models.load_model(f'./models/PRIDNet.h5', custom_objects={'Convolution_block': Convolution_block, 'Channel_attention': Channel_attention, 'Avg_pool_Unet_Upsample_msfe': Avg_pool_Unet_Upsample_msfe, 'Multi_scale_feature_extraction': Multi_scale_feature_extraction, 'Kernel_selecting_module': Kernel_selecting_module})
 
@@ -57,21 +59,25 @@ def full_test(datasets):
     testname = ''
     for dataset in datasets:
         testname += dataset + '_'
-
+    testname = testname.rstrip('_')
+    
+    pathlib.Path('test').mkdir(exist_ok=True)
+    pathlib.Path(f'test/{testname}').mkdir(exist_ok=True)
+    pathlib.Path(f'test/{testname}/imgs').mkdir(exist_ok=True)
     plt.figure()
     plt.title('PSNR')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [psnr_gt_mean, psnr_rednet_mean, psnr_dncnn_mean, psnr_mwcnn_mean, psnr_pridnet_mean, psnr_nlm_mean])
-    plt.savefig(f'./test/{testname}psnr.png')
+    plt.savefig(f'./test/{testname}/psnr.png')
     plt.figure()
     plt.title('SSIM')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [ssim_gt_mean, ssim_rednet_mean, ssim_dncnn_mean, ssim_mwcnn_mean, ssim_pridnet_mean, ssim_nlm_mean])
-    plt.savefig(f'./test/{testname}ssim.png')
+    plt.savefig(f'./test/{testname}/ssim.png')
     plt.figure()
     plt.title('MSE')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [mse_gt_mean, mse_rednet_mean, mse_dncnn_mean, mse_mwcnn_mean, mse_pridnet_mean, mse_nlm_mean])
-    plt.savefig(f'./test/{testname}mse.png')
+    plt.savefig(f'./test/{testname}/mse.png')
 
-    with open(f'./test/{testname}results.csv', 'w') as f:
+    with open(f'./test/{testname}/results.csv', 'w') as f:
         f.write('Model,PSNR,SSIM,MSE\n')
         f.write(f'GT,{psnr_gt_mean},{ssim_gt_mean},{mse_gt_mean}\n')
         f.write(f'REDNet,{psnr_rednet_mean},{ssim_rednet_mean},{mse_rednet_mean}\n')
@@ -80,27 +86,44 @@ def full_test(datasets):
         f.write(f'PRIDNet,{psnr_pridnet_mean},{ssim_pridnet_mean},{mse_pridnet_mean}\n')
         f.write(f'NLM,{psnr_nlm_mean},{ssim_nlm_mean},{mse_nlm_mean}\n')
 
-    choices = random.choices(range(len(gt_imgs)), k=5)
-    for i in choices:
-        gt_img = cv.cvtColor(gt_imgs[i], cv.COLOR_RGB2BGR)
-        noisy_img = cv.cvtColor(noisy_imgs[i], cv.COLOR_RGB2BGR)
-        denoised_img_rednet = cv.cvtColor(denoised_imgs_rednet[i], cv.COLOR_RGB2BGR)
-        denoised_img_dncnn = cv.cvtColor(denoised_imgs_dncnn[i], cv.COLOR_RGB2BGR)
-        denoised_img_mwcnn = cv.cvtColor(denoised_imgs_mwcnn[i], cv.COLOR_RGB2BGR)
-        denoised_img_pridnet = cv.cvtColor(denoised_imgs_pridnet[i], cv.COLOR_RGB2BGR)
-        denoised_img_nlm = cv.cvtColor(denoised_imgs_nlm[i], cv.COLOR_RGB2BGR)
-        cv.imwrite(f'./test/{testname}img{i}_gt.png', gt_img)
-        cv.imwrite(f'./test/{testname}img{i}_noisy.png', noisy_img)
-        cv.imwrite(f'./test/{testname}img{i}_rednet.png', denoised_img_rednet)
-        cv.imwrite(f'./test/{testname}img{i}_dncnn.png', denoised_img_dncnn)
-        cv.imwrite(f'./test/{testname}img{i}_mwcnn.png', denoised_img_mwcnn)
-        cv.imwrite(f'./test/{testname}img{i}_pridnet.png', denoised_img_pridnet)
-        cv.imwrite(f'./test/{testname}img{i}_nlm.png', denoised_img_nlm)
+    if number != None:
+        choices = random.choices(range(len(gt_imgs)), k=number)
+        for i in choices:
+            gt_img = cv.cvtColor(gt_imgs[i], cv.COLOR_RGB2BGR)
+            noisy_img = cv.cvtColor(noisy_imgs[i], cv.COLOR_RGB2BGR)
+            denoised_img_rednet = cv.cvtColor(denoised_imgs_rednet[i], cv.COLOR_RGB2BGR)
+            denoised_img_dncnn = cv.cvtColor(denoised_imgs_dncnn[i], cv.COLOR_RGB2BGR)
+            denoised_img_mwcnn = cv.cvtColor(denoised_imgs_mwcnn[i], cv.COLOR_RGB2BGR)
+            denoised_img_pridnet = cv.cvtColor(denoised_imgs_pridnet[i], cv.COLOR_RGB2BGR)
+            denoised_img_nlm = cv.cvtColor(denoised_imgs_nlm[i], cv.COLOR_RGB2BGR)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_gt.png', gt_img)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_noisy.png', noisy_img)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_rednet.png', denoised_img_rednet)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_dncnn.png', denoised_img_dncnn)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_mwcnn.png', denoised_img_mwcnn)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_pridnet.png', denoised_img_pridnet)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_nlm.png', denoised_img_nlm)
+    else:
+        for i in range(len(gt_imgs)):
+            gt_img = cv.cvtColor(gt_imgs[i], cv.COLOR_RGB2BGR)
+            noisy_img = cv.cvtColor(noisy_imgs[i], cv.COLOR_RGB2BGR)
+            denoised_img_rednet = cv.cvtColor(denoised_imgs_rednet[i], cv.COLOR_RGB2BGR)
+            denoised_img_dncnn = cv.cvtColor(denoised_imgs_dncnn[i], cv.COLOR_RGB2BGR)
+            denoised_img_mwcnn = cv.cvtColor(denoised_imgs_mwcnn[i], cv.COLOR_RGB2BGR)
+            denoised_img_pridnet = cv.cvtColor(denoised_imgs_pridnet[i], cv.COLOR_RGB2BGR)
+            denoised_img_nlm = cv.cvtColor(denoised_imgs_nlm[i], cv.COLOR_RGB2BGR)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_gt.png', gt_img)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_noisy.png', noisy_img)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_rednet.png', denoised_img_rednet)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_dncnn.png', denoised_img_dncnn)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_mwcnn.png', denoised_img_mwcnn)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_pridnet.png', denoised_img_pridnet)
+            cv.imwrite(f'./test/{testname}/imgs/img{i}_nlm.png', denoised_img_nlm)
     print('Done!')
 
 def single_test(gt_path, noisy_path):
     rednet_model = tf.keras.models.load_model('./models/REDNet.h5')
-    dncnn_model = tf.keras.models.load_model('./models/DnCNN.h5')
+    dncnn_model = tf.keras.models.load_model('./models/DnCNN.h5', custom_objects={'Conv_block_Dn': Conv_block_Dn, 'DnCNN': DnCNN})
     mwcnn_model = tf.keras.models.load_model(f'./models/MWCNN.h5', custom_objects={'DWT_downsampling': DWT_downsampling, 'IWT_upsampling': IWT_upsampling, 'Conv_block': Conv_block})
     pridnet_model = tf.keras.models.load_model(f'./models/PRIDNet.h5', custom_objects={'Convolution_block': Convolution_block, 'Channel_attention': Channel_attention, 'Avg_pool_Unet_Upsample_msfe': Avg_pool_Unet_Upsample_msfe, 'Multi_scale_feature_extraction': Multi_scale_feature_extraction, 'Kernel_selecting_module': Kernel_selecting_module})
 
@@ -136,20 +159,25 @@ def single_test(gt_path, noisy_path):
     # insert data output here
 
     print('Saving results...')
+    testname = gt_path.split('/')[-1].split('.')[0]
+    pathlib.Path('test').mkdir(exist_ok=True)
+    pathlib.Path(f'test/{testname}').mkdir(exist_ok=True)
+    pathlib.Path(f'test/{testname}/imgs').mkdir(exist_ok=True)
+
     plt.figure()
     plt.title('PSNR')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [psnr_gt, psnr_rednet, psnr_dncnn, psnr_mwcnn, psnr_pridnet, psnr_nlm])
-    plt.savefig(f'./test/single_psnr.png')
+    plt.savefig(f"./test/{testname}/psnr.png")
     plt.figure()
     plt.title('SSIM')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [ssim_gt, ssim_rednet, ssim_dncnn, ssim_mwcnn, ssim_pridnet, ssim_nlm])
-    plt.savefig(f'./test/single_ssim.png')
+    plt.savefig(f'./test/{testname}/ssim.png')
     plt.figure()
     plt.title('MSE')
     plt.bar(['GT', 'REDNet', 'DnCNN', 'MWCNN', 'PRIDNet', 'NLM'], [mse_gt, mse_rednet, mse_dncnn, mse_mwcnn, mse_pridnet, mse_nlm])
-    plt.savefig(f'./test/single_mse.png')
+    plt.savefig(f'./test/{testname}/mse.png')
 
-    with open('./test/single_results.csv', 'w') as f:
+    with open(f'./test/{testname}/results.csv', 'w') as f:
         f.write('Model,PSNR,SSIM,MSE\n')
         f.write(f'GT,{psnr_gt},{ssim_gt},{mse_gt}\n')
         f.write(f'REDNet,{psnr_rednet},{ssim_rednet},{mse_rednet}\n')
@@ -158,21 +186,25 @@ def single_test(gt_path, noisy_path):
         f.write(f'PRIDNet,{psnr_pridnet},{ssim_pridnet},{mse_pridnet}\n')
         f.write(f'NLM,{psnr_nlm},{ssim_nlm},{mse_nlm}\n')
 
+    gt_image = cv.cvtColor(gt_image, cv.COLOR_RGB2BGR)
+    noisy_image = cv.cvtColor(noisy_image[0], cv.COLOR_RGB2BGR)
     denoised_image_rednet = cv.cvtColor(denoised_image_rednet, cv.COLOR_RGB2BGR)
     denoised_image_dncnn = cv.cvtColor(denoised_image_dncnn, cv.COLOR_RGB2BGR)
     denoised_image_mwcnn = cv.cvtColor(denoised_image_mwcnn, cv.COLOR_RGB2BGR)
     denoised_image_pridnet = cv.cvtColor(denoised_image_pridnet, cv.COLOR_RGB2BGR)
     denoised_image_nlm = cv.cvtColor(denoised_image_nlm, cv.COLOR_RGB2BGR)
-    cv.imwrite('./test/single_rednet.png', denoised_image_rednet)
-    cv.imwrite('./test/single_dncnn.png', denoised_image_dncnn)
-    cv.imwrite('./test/single_mwcnn.png', denoised_image_mwcnn)
-    cv.imwrite('./test/single_pridnet.png', denoised_image_pridnet)
-    cv.imwrite('./test/single_nlm.png', denoised_image_nlm)
+    cv.imwrite(f'./test/{testname}/imgs/gt.png', gt_image)
+    cv.imwrite(f'./test/{testname}/imgs/noisy.png', noisy_image)
+    cv.imwrite(f'./test/{testname}/imgs/rednet.png', denoised_image_rednet)
+    cv.imwrite(f'./test/{testname}/imgs/dncnn.png', denoised_image_dncnn)
+    cv.imwrite(f'./test/{testname}/imgs/mwcnn.png', denoised_image_mwcnn)
+    cv.imwrite(f'./test/{testname}/imgs/pridnet.png', denoised_image_pridnet)
+    cv.imwrite(f'./test/{testname}/imgs/nlm.png', denoised_image_nlm)
     print('Done!')
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'asf:g:d:rp', ['all', 'single', 'file=', 'gt=', 'renoir', 'polyu'])
+        opts, args = getopt.getopt(sys.argv[1:], 'asf:g:d:rpn:', ['all', 'single', 'file=', 'gt=', 'renoir', 'polyu', 'number='])
     except getopt.GetoptError as err:
         print(err)
         exit(2)
@@ -181,6 +213,7 @@ if __name__ == "__main__":
     single = False
     file = None
     gt = None
+    number = None
     datasets = []
 
     for o,a in opts:
@@ -196,6 +229,8 @@ if __name__ == "__main__":
             datasets.append('RENOIR')
         elif o in ('-p', '--polyu'):
             datasets.append('PolyU')
+        elif o in ('-n', '--number'):
+            number = int(a)
 
     if all and single:
         raise Exception('Cannot run all and single at the same time')
@@ -207,8 +242,11 @@ if __name__ == "__main__":
         raise Exception('Must specify at least one dataset for all')
     if single and len(datasets) > 0:
         raise Exception('Cannot specify dataset for single')
+    if single and number != None:
+        raise Exception('Cannot specify number for single')
     
     if all:
-        full_test(datasets)
+        full_test(datasets, number)
     else:
         single_test(gt, file)
+        
