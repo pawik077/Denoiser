@@ -14,7 +14,7 @@ if sys.argv[2] == 'table':
     for row in data:
         if row[0] == 'Model':
             continue
-        print(f'{row[0]} & {float(row[1]):.4f} & {float(row[2]):.4f} & {float(data[1][1]) - float(row[1]):.4f} & {float(data[1][2]) - float(row[2]):.4f} \\\\ \hline')
+        print(f'{row[0]} & {float(row[1]):.4f} & {float(row[2]):.4f} & {(float(row[1]) - float(data[1][1])):.4f} & {(float(row[2]) - float(data[1][2])):.4f} \\\\ \hline')
 elif sys.argv[2] == 'chart':
     models = []
     psnrs = []
