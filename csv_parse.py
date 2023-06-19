@@ -29,11 +29,21 @@ elif sys.argv[2] == 'chart':
         mses.append(float(row[3]))
     plt.figure(0)
     plt.title('PSNR')
-    plt.bar(models, psnrs)
+    psnrs_bar = plt.bar(models, psnrs)
+    plt.bar_label(psnrs_bar, fmt='{:.2f}')
+    if len(sys.argv) == 4 and sys.argv[3] == 'save':
+        plt.savefig(f'./test/{sys.argv[1]}/psnr.png')
     plt.figure(1)
     plt.title('SSIM')
-    plt.bar(models, ssims)
+    ssims_bar = plt.bar(models, ssims)
+    plt.bar_label(ssims_bar, fmt='{:.2f}')
+    if len(sys.argv) == 4 and sys.argv[3] == 'save':
+        plt.savefig(f'./test/{sys.argv[1]}/ssim.png')
     plt.figure(2)
     plt.title('MSE')
-    plt.bar(models, mses)
-    plt.show()
+    mses_bar = plt.bar(models, mses)
+    plt.bar_label(mses_bar, fmt='{:.2f}')
+    if len(sys.argv) == 4 and sys.argv[3] == 'save':
+        plt.savefig(f'./test/{sys.argv[1]}/mse.png')
+    if len(sys.argv) == 3:
+        plt.show()
